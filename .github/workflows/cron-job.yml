@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Or a compatible version
+          node-version: '20' # Use the latest stable version of Node.js
 
       - name: Install Node.js dependencies
         run: npm install
@@ -24,7 +24,7 @@ jobs:
 
       - name: Clear npm cache
         run: npm cache clean --force
-        working-directory: ./html-to-image # Optional but helps if clearing the cache for that directory
+        working-directory: ./html-to-image
 
       - name: Run Node.js script
         run: node convert-to-image.js
