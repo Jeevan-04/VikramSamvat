@@ -40,7 +40,6 @@ def split_date_text(text):
 def get_vikram_samvat_date():
     url = 'https://www.drikpanchang.com/?lang=hi'
     response = requests.get(url)
-    response.raise_for_status()  # Ensure we notice bad responses
     soup = BeautifulSoup(response.text, 'html.parser')
     
     # Find the main div that contains the date information
@@ -80,4 +79,4 @@ def get_vikram_samvat():
     return jsonify(date)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
