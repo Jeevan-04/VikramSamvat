@@ -1,4 +1,4 @@
-name: Run Python Script
+name: Run Node.js and Python Scripts
 
 on:
   schedule:
@@ -13,10 +13,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Or a compatible version
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: ./html-to-image
+
+      - name: Clear npm cache
+        run: npm cache clean --force
+
+      - name: Run Node.js script
+        run: node convert-to-image.js
+        working-directory: ./html-to-image
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.10' # Use the version you need
+          python-version: '3.10' # Or a compatible version
 
       - name: Install Python dependencies
         run: |
