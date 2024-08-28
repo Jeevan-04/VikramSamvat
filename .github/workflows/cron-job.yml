@@ -18,9 +18,12 @@ jobs:
         with:
           node-version: '20' # or the version you need
 
-      - name: Install dependencies
+      - name: Install Node.js dependencies
         run: npm install
         working-directory: ./html-to-image
+
+      - name: Clear npm cache
+        run: npm cache clean --force
 
       - name: Run script
         run: node convert-to-image.js
