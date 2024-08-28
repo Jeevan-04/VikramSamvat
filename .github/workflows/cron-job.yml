@@ -22,15 +22,16 @@ jobs:
         run: node --version
 
       - name: Install Node.js dependencies
-        run: npm ci # Clean install
-        working-directory: ./html-to-image
+        run: npm ci
+        working-directory: ./html-to-image # Ensure this points to the 'html-to-image' directory
 
+      # Consider removing this if not needed
       - name: Clear npm cache
         run: npm cache clean --force
 
-      - name: Run Node.js script
+      - name: Run Node.js script with timeout
         run: timeout 120s node convert-to-image.js
-        working-directory: ./html-to-image
+        working-directory: ./html-to-image # Ensure this points to the 'html-to-image' directory
 
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -41,8 +42,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-        working-directory: ./
+        working-directory: ./ # This should be root, where 'requirements.txt' is located
 
       - name: Run Python script
         run: python ./app.py
-        working-directory: ./
+        working-directory: ./ # This should be root, where 'app.py' is located
