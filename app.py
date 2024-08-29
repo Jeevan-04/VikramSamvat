@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify
 import requests
 from bs4 import BeautifulSoup
 import re
+import os
 
 app = Flask(__name__)
 
@@ -79,4 +80,5 @@ def get_vikram_samvat():
     return jsonify(date)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Default to port 5000 if no PORT environment variable
+    app.run(host="0.0.0.0", port=port, debug=True)
