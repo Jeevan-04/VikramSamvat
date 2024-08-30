@@ -51,17 +51,20 @@ def get_vikram_samvat_date():
             'parts': ["Date not found", "Date not found", "Date not found"]
         }
     
-    # Print the raw content for debugging
+    # Debug: Print the raw content for inspection
     print("Raw main_div content:", main_div.prettify())
 
-    # Find the specific divs with the date information
-    child_divs = main_div.find_all('div', recursive=False)
-    texts = [div.get_text(strip=True) for div in child_divs]
-    print("Texts extracted from child divs:", texts)  # Debugging output
+    # Find the specific divs with the date information and remove any empty divs
+    child_divs = [div.get_text(strip=True) for div in main_div.find_all('div', recursive=False) if div.get_text(strip=True)]
+    print("Filtered texts extracted from child divs:", child_divs)  # Debugging output
 
-    full_text = " ".join(texts)
-    full_text = convert_to_devanagari(full_text)
-    date_parts = split_date_text(full_text)
+    if len(child_divs) >= 3:
+        full_text = " ".join(child_divs)
+        full_text = convert_to_devanagari(full_text)
+        date_parts = split_date_text(full_text)
+    else:
+        # Handle unexpected structure
+        date_parts = ["Date not found", "Date not found", "Date not found"]
     
     return {
         'parts': date_parts
