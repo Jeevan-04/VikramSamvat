@@ -41,7 +41,7 @@ def split_date_text(text):
 
 def get_vikram_samvat_date():
     url = 'https://www.drikpanchang.com/?lang=hi'
-    response = requests.get(url)
+    response = requests.get(url, headers={'Cache-Control': 'no-cache'})
     soup = BeautifulSoup(response.text, 'html.parser')
     
     main_div = soup.find('div', class_='dpPHeaderLeftContent dpFlex')
@@ -51,8 +51,14 @@ def get_vikram_samvat_date():
             'parts': ["Date not found", "Date not found", "Date not found"]
         }
     
+    # Print the raw content for debugging
+    print("Raw main_div content:", main_div.prettify())
+
+    # Find the specific divs with the date information
     child_divs = main_div.find_all('div', recursive=False)
     texts = [div.get_text(strip=True) for div in child_divs]
+    print("Texts extracted from child divs:", texts)  # Debugging output
+
     full_text = " ".join(texts)
     full_text = convert_to_devanagari(full_text)
     date_parts = split_date_text(full_text)
