@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
-import requests
+from selenium import webdriver
 from bs4 import BeautifulSoup
 import re
 import os
@@ -41,8 +41,20 @@ def split_date_text(text):
 
 def get_vikram_samvat_date():
     url = 'https://www.drikpanchang.com/?lang=hi'
-    response = requests.get(url, headers={'Cache-Control': 'no-cache'})
-    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # Set up Selenium with ChromeDriver
+    driver = webdriver.Chrome()  # Ensure ChromeDriver is installed and added to PATH
+    driver.get(url)
+    
+    # Give the page time to load content
+    driver.implicitly_wait(10)
+    
+    # Get the page source and pass it to BeautifulSoup
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    driver.quit()  # Close the browser
+
+    # Debug: Print the raw HTML for inspection
+    print("Raw HTML:", soup.prettify())
     
     main_div = soup.find('div', class_='dpPHeaderLeftContent dpFlex')
     
@@ -51,9 +63,9 @@ def get_vikram_samvat_date():
             'parts': ["Date not found", "Date not found", "Date not found"]
         }
     
-    # Debug: Print the raw content for inspection
-    print("Raw main_div content:", main_div.prettify())
-
+    # Debug: Print the content of the main div
+    print("Main Div Content:", main_div.prettify())
+    
     # Find the specific divs with the date information and remove any empty divs
     child_divs = [div.get_text(strip=True) for div in main_div.find_all('div', recursive=False) if div.get_text(strip=True)]
     print("Filtered texts extracted from child divs:", child_divs)  # Debugging output
