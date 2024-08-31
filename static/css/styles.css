@@ -6,9 +6,10 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 -1px 3px rgba(255, 255, 255, 0.6); 
     text-align: center;
     position: fixed;
-    width: 150px; 
+    width: fit-content; 
     font-size: 10px;
     z-index: 1000;
+    overflow-wrap: break-word; /* Handles text overflow */
 }
 
 .badge-line {
