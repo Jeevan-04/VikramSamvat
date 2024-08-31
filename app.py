@@ -66,12 +66,11 @@ def get_vikram_samvat_date():
     # Split the text into parts based on criteria
     date_parts = split_date_text(full_text)
 
-    # Example time zone conversion
-    # Assuming the date string contains local time info
-    # Adjust as necessary based on actual date format
-    local_tz = pytz.timezone('Asia/Kolkata')  # Replace with actual time zone if different
+    # Handle time zone adjustment
+    local_tz = pytz.timezone('Asia/Kolkata')  # IST (UTC+5:30)
     now = datetime.now(local_tz)
     utc_now = now.astimezone(pytz.utc)
+    print(f"Current Time (IST): {now}")
     print(f"Current Time (UTC): {utc_now}")
 
     return {
