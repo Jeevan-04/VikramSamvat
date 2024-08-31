@@ -3,6 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
+from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 
@@ -76,6 +78,9 @@ def index():
 def get_vikram_samvat():
     date = get_vikram_samvat_date()
     return jsonify(date)
+
+print("Server Time:", datetime.now())
+print("Server Time Zone:", pytz.utc.zone)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Default to port 5000 if no PORT environment variable
