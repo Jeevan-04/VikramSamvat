@@ -70,8 +70,9 @@ def get_vikram_samvat_date():
     local_tz = pytz.timezone('Asia/Kolkata')  # IST (UTC+5:30)
     now = datetime.now(local_tz)
     utc_now = now.astimezone(pytz.utc)
-    print(f"Current Time (IST): {now}")
-    print(f"Current Time (UTC): {utc_now}")
+
+    print(f"Current Time (IST): {now.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Current Time (UTC): {utc_now.strftime('%Y-%m-%d %H:%M:%S')}")
 
     return {
         'parts': date_parts
