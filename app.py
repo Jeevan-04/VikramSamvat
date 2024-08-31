@@ -24,60 +24,36 @@ def get_vikram_samvat_date():
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Find the div containing the date information
-    main_div = soup.find('div', class_='dpPHeaderLeftWrapper')
+    # Find the main container div which holds the date elements
+    main_div = soup.find('div', class_='dpPHeaderLeftContent')
 
     if not main_div:
-        logging.error("Main div not found")
+        logging.error("Main div containing date information not found")
         return {
             'lines': ["Date not found", "Date not found", "Date not found"]
         }
 
-    # Extract date details
-    date_details = main_div.find_all('div', recursive=False)
+    # Extract the specific div elements
+    date_parts = main_div.find_all('div')
 
-    if date_details and len(date_details) > 1:
-        combined_date_string = date_details[1].get_text(strip=True)
-
-        # Check for "Krishna Paksha" or "Shukla Paksha" and split
-        if "Krishna Paksha" in combined_date_string:
-            split1 = "Krishna Paksha"
-        elif "Shukla Paksha" in combined_date_string:
-            split1 = "Shukla Paksha"
-        else:
-            split1 = None
-
-        if split1:
-            first_split = combined_date_string.split(split1, 1)
-            day_month_part = first_split[0].strip()
-            paksha_tithi_part = split1
-            remaining_text = first_split[1].strip()
-        else:
-            logging.error("Paksha not found in the combined date string.")
-            return {
-                'lines': ["Date not found", "Date not found", "Date not found"]
-            }
-
-        # Use regex to find the first number for splitting the remaining text
-        import re
-        match = re.search(r'(\d+)', remaining_text)
-        if match:
-            samvat_part = remaining_text[match.start():].strip()
-        else:
-            logging.error("Number not found in the remaining text for Vikrama Samvata.")
-            samvat_part = "Data not found"
-
-        # Collect the date lines
-        date_lines = [day_month_part, paksha_tithi_part, samvat_part]
+    if date_parts and len(date_parts) >= 3:
+        # Extract each date detail
+        day_month = date_parts[0].get_text(strip=True)
+        paksha_tithi = date_parts[1].get_text(strip=True)
+        samvat_details = date_parts[2].get_text(strip=True)
+        
+        # Store extracted details in list
+        date_lines = [day_month, paksha_tithi, samvat_details]
     else:
-        logging.error("Date details div not found or empty.")
+        logging.error("Date parts not found or insufficient data.")
         date_lines = ["Date not found", "Date not found", "Date not found"]
 
-    logging.info(f"Extracted text from child divs: {date_lines}")
+    logging.info(f"Extracted text from specific divs: {date_lines}")
 
     return {
         'lines': date_lines
     }
+
 
 @app.route('/')
 def index():
