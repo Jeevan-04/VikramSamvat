@@ -25,7 +25,7 @@ def get_vikram_samvat_date():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find the div containing the date information
-    main_div = soup.find('div', class_='dpPHeaderLeftContent dpFlex')
+    main_div = soup.find('div', class_='dpPHeaderLeftWrapper')
 
     if not main_div:
         logging.error("Main div not found")
@@ -36,14 +36,17 @@ def get_vikram_samvat_date():
     # Extract date details
     date_details = main_div.find_all('div', recursive=False)
     
-    if len(date_details) < 4:
-        logging.error(f"Expected at least 4 child divs, but found {len(date_details)}.")
-        return {
-            'lines': ["Date not found", "Date not found", "Date not found", "Location not found"]
-        }
+    # Extract the relevant details from the first three divs
+    if len(date_details) >= 3:
+        date_lines = [div.get_text(strip=True) for div in date_details[:3]]
+    else:
+        date_lines = ["Date not found"] * 3
 
-    # Extract text from each relevant div
-    date_lines = [div.get_text(strip=True) for div in date_details[:4]]
+    # Also extract the location if it exists
+    location_div = main_div.find_all('div')[-1].get_text(strip=True) if len(date_details) > 3 else "Location not found"
+
+    date_lines.append(location_div)
+
     logging.info(f"Extracted text from child divs: {date_lines}")
 
     return {
