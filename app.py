@@ -66,6 +66,14 @@ def get_vikram_samvat_date():
     # Split the text into parts based on criteria
     date_parts = split_date_text(full_text)
 
+    # Example time zone conversion
+    # Assuming the date string contains local time info
+    # Adjust as necessary based on actual date format
+    local_tz = pytz.timezone('Asia/Kolkata')  # Replace with actual time zone if different
+    now = datetime.now(local_tz)
+    utc_now = now.astimezone(pytz.utc)
+    print(f"Current Time (UTC): {utc_now}")
+
     return {
         'parts': date_parts
     }
@@ -78,9 +86,6 @@ def index():
 def get_vikram_samvat():
     date = get_vikram_samvat_date()
     return jsonify(date)
-
-print("Server Time:", datetime.now())
-print("Server Time Zone:", pytz.utc.zone)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Default to port 5000 if no PORT environment variable
