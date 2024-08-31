@@ -34,15 +34,15 @@ def get_vikram_samvat_date():
         }
 
     # Extract the specific div elements
-    date_parts = main_div.find_all('div')
+    date_parts = main_div.find_all('div', recursive=True)
 
     if date_parts and len(date_parts) >= 3:
-        # Extract each date detail
+        # Extract text from each div and strip any surrounding whitespace
         day_month = date_parts[0].get_text(strip=True)
         paksha_tithi = date_parts[1].get_text(strip=True)
         samvat_details = date_parts[2].get_text(strip=True)
-        
-        # Store extracted details in list
+
+        # Store extracted details in a list
         date_lines = [day_month, paksha_tithi, samvat_details]
     else:
         logging.error("Date parts not found or insufficient data.")
