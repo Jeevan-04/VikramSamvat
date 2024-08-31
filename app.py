@@ -24,8 +24,12 @@ def get_vikram_samvat_date():
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
+    # Debugging: Print the HTML content to see the structure
+    logging.debug("HTML content fetched: %s", soup.prettify())
+
     # Find the div containing the date information
     main_div = soup.find('div', class_='dpPHeaderLeftWrapper')
+    logging.info("Main div found: %s", main_div)
 
     if not main_div:
         logging.error("Main div not found")
@@ -35,7 +39,8 @@ def get_vikram_samvat_date():
 
     # Extract date details
     date_details = main_div.find_all('div', recursive=False)
-    
+    logging.info("Date details found: %s", date_details)
+
     # Extract the relevant details from the first three divs
     if len(date_details) >= 3:
         date_lines = [div.get_text(strip=True) for div in date_details[:3]]
