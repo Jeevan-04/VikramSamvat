@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import re
 import os
 from datetime import datetime, timedelta
-import pytz
 import logging
 
 app = Flask(__name__)
@@ -12,18 +11,12 @@ app = Flask(__name__)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Dictionary for converting English digits to Devanagari numerals
-english_to_devanagari = str.maketrans('0123456789', '०१२३४५६७८९')
-
-def convert_to_devanagari(text):
-    return text.translate(english_to_devanagari)
-
 def split_date_text(text):
-    # Define the keywords and numbers for splitting
-    keywords = ['कृष्ण पक्ष', 'शुक्ल पक्ष']
+    # Define the keywords for splitting
+    keywords = ['Krishna Paksha', 'Shukla Paksha', 'Chaturdashi', 'Purnima', 'Amavasya']
     parts = []
 
-    # Split the text based on keywords and numbers
+    # Split the text based on keywords
     for keyword in keywords:
         if keyword in text:
             before_keyword, after_keyword = text.split(keyword, 1)
@@ -43,7 +36,7 @@ def split_date_text(text):
     return (parts + ["Date not found"] * 3)[:3]
 
 def get_vikram_samvat_date():
-    url = 'https://www.drikpanchang.com/?lang=hi'
+    url = 'https://www.drikpanchang.com/?geoname-id=1275339'
     response = requests.get(url)
 
     logging.info("Fetched HTML content from the website.")
@@ -54,7 +47,7 @@ def get_vikram_samvat_date():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find the main div that contains the date information
-    main_div = soup.find('div', class_='dpPHeaderLeftContent dpFlex')
+    main_div = soup.find('div', class_='panchang-date')
 
     if not main_div:
         logging.error("Main div not found")
@@ -62,40 +55,18 @@ def get_vikram_samvat_date():
             'parts': ["Date not found", "Date not found", "Date not found"]
         }
 
-    # Extract all child divs directly inside the main div
-    child_divs = main_div.find_all('div', recursive=False)
+    # Extract the text directly from the div
+    text = main_div.get_text(strip=True)
 
-    if not child_divs:
-        logging.error("No child divs found")
-        return {
-            'parts': ["Date not found", "Date not found", "Date not found"]
-        }
-
-    # Extract text from each div
-    texts = [div.get_text(strip=True) for div in child_divs]
-
-    logging.info(f"Extracted text from child divs: {texts}")
-
-    # Join all texts to handle cases where text spans across multiple divs
-    full_text = " ".join(texts)
-
-    # Convert English digits to Devanagari numerals
-    full_text = convert_to_devanagari(full_text)
-
-    logging.info(f"Full text after conversion: {full_text}")
+    logging.info(f"Extracted text from main div: {text}")
 
     # Split the text into parts based on criteria
-    date_parts = split_date_text(full_text)
-
-    # Handle time zone adjustment
-    local_tz = pytz.timezone('Asia/Kolkata')  # IST (UTC+5:30)
-    now = datetime.now(local_tz)
+    date_parts = split_date_text(text)
 
     # Calculate the next date
-    next_date = now + timedelta(days=1)
+    next_date = datetime.now() + timedelta(days=1)
 
-    logging.info(f"Current Time (IST): {now.strftime('%Y-%m-%d %H:%M:%S')}")
-    logging.info(f"Next Date (IST): {next_date.strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"Next Date: {next_date.strftime('%Y-%m-%d %H:%M:%S')}")
 
     return {
         'parts': date_parts,
