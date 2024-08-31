@@ -14,6 +14,11 @@ from bs4 import BeautifulSoup
 import logging
 import re
 
+import requests
+from bs4 import BeautifulSoup
+import logging
+import re
+
 def get_vikram_samvat_date():
     url = 'https://www.drikpanchang.com/?geoname-id=1275339'
     response = requests.get(url)
@@ -57,7 +62,7 @@ def get_vikram_samvat_date():
         # Split the string based on the paksha keyword
         if paksha_keyword:
             first_split = combined_date_string.split(paksha_keyword, 1)
-            first_part = first_split[0].strip() + ","
+            first_part = first_split[0].strip()
             remaining_text = paksha_keyword + ", " + first_split[1].strip()
         else:
             logging.error("Paksha not found in the combined date string.")
@@ -75,6 +80,13 @@ def get_vikram_samvat_date():
             second_part = "Data not found"
             third_part = "Data not found"
 
+        # Remove trailing commas from the first part
+        if first_part.endswith(','):
+            first_part = first_part[:-1].strip()
+
+        # Remove extra commas from the second part
+        second_part = re.sub(r',\s*,', ',', second_part).strip()
+
         # Collect the date lines
         date_lines = [first_part, second_part, third_part]
     else:
@@ -86,7 +98,7 @@ def get_vikram_samvat_date():
     return {
         'lines': date_lines
     }
-
+    
 @app.route('/')
 def index():
     return render_template('index.html')
