@@ -68,6 +68,12 @@ def get_vikram_samvat_date():
         'parts': date_parts
     }
 
+# Function to be triggered by the cron job every 12 hours
+def update_date_data():
+    date_data = get_vikram_samvat_date()
+    with open('date_data.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(date_data, ensure_ascii=False, indent=4))
+
 @app.route('/')
 def index():
     return render_template('index.html')
