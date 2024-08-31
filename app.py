@@ -45,6 +45,14 @@ def split_date_text(text):
 def get_vikram_samvat_date():
     url = 'https://www.drikpanchang.com/?lang=hi'
     response = requests.get(url)
+
+    logging.info("Fetched HTML content from the website.")
+
+    # Log the status code and some content for debugging
+    logging.info(f"Status Code: {response.status_code}")
+    logging.info("HTML Content (first 500 chars):")
+    logging.info(response.text[:500])
+
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find the main div that contains the date information
@@ -68,11 +76,15 @@ def get_vikram_samvat_date():
     # Extract text from each div
     texts = [div.get_text(strip=True) for div in child_divs]
 
+    logging.info(f"Extracted text from child divs: {texts}")
+
     # Join all texts to handle cases where text spans across multiple divs
     full_text = " ".join(texts)
 
     # Convert English digits to Devanagari numerals
     full_text = convert_to_devanagari(full_text)
+
+    logging.info(f"Full text after conversion: {full_text}")
 
     # Split the text into parts based on criteria
     date_parts = split_date_text(full_text)
