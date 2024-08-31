@@ -9,6 +9,11 @@ app = Flask(__name__)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+import requests
+from bs4 import BeautifulSoup
+import logging
+import re
+
 def get_vikram_samvat_date():
     url = 'https://www.drikpanchang.com/?geoname-id=1275339'
     response = requests.get(url)
@@ -37,7 +42,7 @@ def get_vikram_samvat_date():
     date_parts = main_div.find_all('div', recursive=True)
 
     if date_parts and len(date_parts) >= 3:
-        # Combined string from the second div
+        # Extract the combined string from the second div
         combined_date_string = date_parts[1].get_text(strip=True)
         logging.info(f"Combined date string: {combined_date_string}")
 
@@ -52,8 +57,8 @@ def get_vikram_samvat_date():
         # Split the string based on the paksha keyword
         if paksha_keyword:
             first_split = combined_date_string.split(paksha_keyword, 1)
-            first_part = first_split[0].strip() + f", {paksha_keyword}"
-            remaining_text = first_split[1].strip()
+            first_part = first_split[0].strip() + ","
+            remaining_text = paksha_keyword + ", " + first_split[1].strip()
         else:
             logging.error("Paksha not found in the combined date string.")
             return {
@@ -61,7 +66,6 @@ def get_vikram_samvat_date():
             }
 
         # Use regex to find the first number in the remaining text
-        import re
         match = re.search(r'(\d+)', remaining_text)
         if match:
             second_part = remaining_text[:match.start()].strip()
@@ -82,7 +86,6 @@ def get_vikram_samvat_date():
     return {
         'lines': date_lines
     }
-
 
 @app.route('/')
 def index():
