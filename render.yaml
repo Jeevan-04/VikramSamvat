@@ -18,5 +18,5 @@ services:
     name: update-date-cron
     env: python
     schedule: "0 */12 * * *"  # Every 12 hours
-    command: "python -c 'from app import update_date_data; update_date_data()'"
+    command: "python update_date.py"
     plan: free
