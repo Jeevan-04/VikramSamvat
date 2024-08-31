@@ -37,18 +37,47 @@ def get_vikram_samvat_date():
     date_parts = main_div.find_all('div', recursive=True)
 
     if date_parts and len(date_parts) >= 3:
-        # Extract text from each div and strip any surrounding whitespace
-        day_month = date_parts[0].get_text(strip=True)
-        paksha_tithi = date_parts[1].get_text(strip=True)
-        samvat_details = date_parts[2].get_text(strip=True)
+        # Combined string from the second div
+        combined_date_string = date_parts[1].get_text(strip=True)
+        logging.info(f"Combined date string: {combined_date_string}")
 
-        # Store extracted details in a list
-        date_lines = [day_month, paksha_tithi, samvat_details]
+        # Determine the keyword to split by
+        if "Krishna Paksha" in combined_date_string:
+            paksha_keyword = "Krishna Paksha"
+        elif "Shukla Paksha" in combined_date_string:
+            paksha_keyword = "Shukla Paksha"
+        else:
+            paksha_keyword = None
+
+        # Split the string based on the paksha keyword
+        if paksha_keyword:
+            first_split = combined_date_string.split(paksha_keyword, 1)
+            first_part = first_split[0].strip() + f", {paksha_keyword}"
+            remaining_text = first_split[1].strip()
+        else:
+            logging.error("Paksha not found in the combined date string.")
+            return {
+                'lines': ["Date not found", "Date not found", "Date not found"]
+            }
+
+        # Use regex to find the first number in the remaining text
+        import re
+        match = re.search(r'(\d+)', remaining_text)
+        if match:
+            second_part = remaining_text[:match.start()].strip()
+            third_part = remaining_text[match.start():].strip()
+        else:
+            logging.error("Number not found in the remaining text for Vikrama Samvata.")
+            second_part = "Data not found"
+            third_part = "Data not found"
+
+        # Collect the date lines
+        date_lines = [first_part, second_part, third_part]
     else:
         logging.error("Date parts not found or insufficient data.")
         date_lines = ["Date not found", "Date not found", "Date not found"]
 
-    logging.info(f"Extracted text from specific divs: {date_lines}")
+    logging.info(f"Extracted text from child divs: {date_lines}")
 
     return {
         'lines': date_lines
