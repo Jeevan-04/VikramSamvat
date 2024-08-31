@@ -5,8 +5,12 @@ import re
 import os
 from datetime import datetime
 import pytz
+import logging
 
 app = Flask(__name__)
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Dictionary for converting English digits to Devanagari numerals
 english_to_devanagari = str.maketrans('0123456789', '०१२३४५६७८९')
@@ -47,12 +51,19 @@ def get_vikram_samvat_date():
     main_div = soup.find('div', class_='dpPHeaderLeftContent dpFlex')
 
     if not main_div:
+        logging.error("Main div not found")
         return {
             'parts': ["Date not found", "Date not found", "Date not found"]
         }
 
     # Extract all child divs directly inside the main div
     child_divs = main_div.find_all('div', recursive=False)
+
+    if not child_divs:
+        logging.error("No child divs found")
+        return {
+            'parts': ["Date not found", "Date not found", "Date not found"]
+        }
 
     # Extract text from each div
     texts = [div.get_text(strip=True) for div in child_divs]
@@ -71,8 +82,8 @@ def get_vikram_samvat_date():
     now = datetime.now(local_tz)
     utc_now = now.astimezone(pytz.utc)
 
-    print(f"Current Time (IST): {now.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Current Time (UTC): {utc_now.strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"Current Time (IST): {now.strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"Current Time (UTC): {utc_now.strftime('%Y-%m-%d %H:%M:%S')}")
 
     return {
         'parts': date_parts
