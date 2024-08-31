@@ -37,14 +37,11 @@ def get_vikram_samvat_date():
     date_details = main_div.find_all('div', recursive=False)
     
     # Extract the relevant details from the first three divs
-    if len(date_details) >= 3:
-        date_lines = [div.get_text(strip=True) for div in date_details[:3]]
-    else:
-        date_lines = ["Date not found"] * 3
-
-    # Also extract the location if it exists
-    location_div = main_div.find_all('div')[-1].get_text(strip=True) if len(date_details) > 3 else "Location not found"
-
+    date_lines = [div.get_text(strip=True) for div in date_details[:3]]
+    
+    # Extract the location if it exists
+    location_div = date_details[3].get_text(strip=True) if len(date_details) > 3 else "Location not found"
+    
     date_lines.append(location_div)
 
     logging.info(f"Extracted text from child divs: {date_lines}")
@@ -52,6 +49,7 @@ def get_vikram_samvat_date():
     return {
         'lines': date_lines
     }
+
 
 @app.route('/')
 def index():
