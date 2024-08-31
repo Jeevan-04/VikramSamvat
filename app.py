@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import logging
 
@@ -90,13 +90,16 @@ def get_vikram_samvat_date():
     # Handle time zone adjustment
     local_tz = pytz.timezone('Asia/Kolkata')  # IST (UTC+5:30)
     now = datetime.now(local_tz)
-    utc_now = now.astimezone(pytz.utc)
+
+    # Calculate the next date
+    next_date = now + timedelta(days=1)
 
     logging.info(f"Current Time (IST): {now.strftime('%Y-%m-%d %H:%M:%S')}")
-    logging.info(f"Current Time (UTC): {utc_now.strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"Next Date (IST): {next_date.strftime('%Y-%m-%d %H:%M:%S')}")
 
     return {
-        'parts': date_parts
+        'parts': date_parts,
+        'next_date': next_date.strftime('%Y-%m-%d %H:%M:%S')
     }
 
 @app.route('/')
