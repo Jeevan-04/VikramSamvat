@@ -18,5 +18,5 @@ services:
     name: update-date-cron
     env: python
     schedule: "0 */12 * * *"  # Every 12 hours
-    command: "python update_date.py"
+    command: "/usr/local/bin/python update_date.py"  # Full path to Python executable
     plan: free
