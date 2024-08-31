@@ -47,8 +47,6 @@ def get_vikram_samvat_date():
     response = requests.get(url)
 
     logging.info("Fetched HTML content from the website.")
-
-    # Log the status code and some content for debugging
     logging.info(f"Status Code: {response.status_code}")
     logging.info("HTML Content (first 500 chars):")
     logging.info(response.text[:500])
@@ -112,4 +110,4 @@ def get_vikram_samvat():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Default to port 5000 if no PORT environment variable
-    app.run(host="0.0.0.0", port=port, debug=True)  # Correctly closed parentheses here
+    app.run(host="0.0.0.0", port=port, debug=True)
