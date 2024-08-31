@@ -19,7 +19,7 @@ def get_vikram_samvat_date():
     if response.status_code != 200:
         logging.error("Failed to retrieve content from the URL.")
         return {
-            'lines': ["Date not found", "Date not found", "Date not found", "Location not found"]
+            'lines': ["Date not found", "Date not found", "Date not found"]
         }
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -35,22 +35,42 @@ def get_vikram_samvat_date():
 
     # Extract date details
     date_details = main_div.find_all('div', recursive=False)
-    
-    # Now process each div to split into specific parts
-    if date_details:
-        # Split the first div into "Day" and "Month"
-        day_month = date_details[0].get_text(strip=True).split(',', 1)
-        day = day_month[0] if len(day_month) > 0 else "Day not found"
-        month = day_month[1] if len(day_month) > 1 else "Month not found"
 
-        # Second div contains "Paksha and Tithi"
-        paksha_tithi = date_details[1].get_text(strip=True) if len(date_details) > 1 else "Paksha/Tithi not found"
+    if date_details and len(date_details) > 1:
+        combined_date_string = date_details[1].get_text(strip=True)
 
-        # Third div contains "Samvat details"
-        samvat_details = date_details[2].get_text(strip=True) if len(date_details) > 2 else "Samvat not found"
-    
-        date_lines = [day, month, paksha_tithi, samvat_details]
+        # Check for "Krishna Paksha" or "Shukla Paksha" and split
+        if "Krishna Paksha" in combined_date_string:
+            split1 = "Krishna Paksha"
+        elif "Shukla Paksha" in combined_date_string:
+            split1 = "Shukla Paksha"
+        else:
+            split1 = None
+
+        if split1:
+            first_split = combined_date_string.split(split1, 1)
+            day_month_part = first_split[0].strip()
+            paksha_tithi_part = split1
+            remaining_text = first_split[1].strip()
+        else:
+            logging.error("Paksha not found in the combined date string.")
+            return {
+                'lines': ["Date not found", "Date not found", "Date not found"]
+            }
+
+        # Use regex to find the first number for splitting the remaining text
+        import re
+        match = re.search(r'(\d+)', remaining_text)
+        if match:
+            samvat_part = remaining_text[match.start():].strip()
+        else:
+            logging.error("Number not found in the remaining text for Vikrama Samvata.")
+            samvat_part = "Data not found"
+
+        # Collect the date lines
+        date_lines = [day_month_part, paksha_tithi_part, samvat_part]
     else:
+        logging.error("Date details div not found or empty.")
         date_lines = ["Date not found", "Date not found", "Date not found"]
 
     logging.info(f"Extracted text from child divs: {date_lines}")
@@ -58,8 +78,6 @@ def get_vikram_samvat_date():
     return {
         'lines': date_lines
     }
-
-
 
 @app.route('/')
 def index():
