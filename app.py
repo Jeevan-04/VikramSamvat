@@ -15,8 +15,12 @@ def get_vikram_samvat_date():
 
     logging.info("Fetched HTML content from the website.")
     logging.info(f"Status Code: {response.status_code}")
-    logging.info("HTML Content (first 500 chars):")
-    logging.info(response.text[:500])
+
+    if response.status_code != 200:
+        logging.error("Failed to retrieve content from the URL.")
+        return {
+            'lines': ["Date not found", "Date not found", "Date not found", "Location not found"]
+        }
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -26,25 +30,24 @@ def get_vikram_samvat_date():
     if not main_div:
         logging.error("Main div not found")
         return {
-            'lines': ["Date not found", "Date not found", "Date not found"]
+            'lines': ["Date not found", "Date not found", "Date not found", "Location not found"]
         }
 
-    # Extract all child divs directly inside the main div
-    child_divs = main_div.find_all('div', recursive=False)
-
-    if len(child_divs) < 3:
-        logging.error("Expected 3 child divs, but found less.")
+    # Extract date details
+    date_details = main_div.find_all('div', recursive=False)
+    
+    if len(date_details) < 4:
+        logging.error(f"Expected at least 4 child divs, but found {len(date_details)}.")
         return {
-            'lines': ["Date not found", "Date not found", "Date not found"]
+            'lines': ["Date not found", "Date not found", "Date not found", "Location not found"]
         }
 
-    # Extract text from each div
-    lines = [div.get_text(strip=True) for div in child_divs]
-
-    logging.info(f"Extracted text from child divs: {lines}")
+    # Extract text from each relevant div
+    date_lines = [div.get_text(strip=True) for div in date_details[:4]]
+    logging.info(f"Extracted text from child divs: {date_lines}")
 
     return {
-        'lines': lines
+        'lines': date_lines
     }
 
 @app.route('/')
