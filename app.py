@@ -36,20 +36,31 @@ def get_vikram_samvat_date():
     # Extract date details
     date_details = main_div.find_all('div', recursive=False)
     
-    # Extract the relevant details from the first three divs
-    date_lines = [div.get_text(strip=True) for div in date_details[:3]]
+    # Now process each div to split into specific parts
+    if date_details:
+        # Split the first div into "Day" and "Month"
+        day_month = date_details[0].get_text(strip=True).split(',', 1)
+        day = day_month[0] if len(day_month) > 0 else "Day not found"
+        month = day_month[1] if len(day_month) > 1 else "Month not found"
+
+        # Second div contains "Paksha and Tithi"
+        paksha_tithi = date_details[1].get_text(strip=True) if len(date_details) > 1 else "Paksha/Tithi not found"
+
+        # Third div contains "Samvat details"
+        samvat_details = date_details[2].get_text(strip=True) if len(date_details) > 2 else "Samvat not found"
+
+        # Extract the location if it exists
+        location_div = date_details[3].get_text(strip=True) if len(date_details) > 3 else "Location not found"
     
-    # Extract the location if it exists
-    location_div = date_details[3].get_text(strip=True) if len(date_details) > 3 else "Location not found"
-    
-    date_lines.append(location_div)
+        date_lines = [day, month, paksha_tithi, samvat_details, location_div]
+    else:
+        date_lines = ["Date not found", "Date not found", "Date not found", "Location not found"]
 
     logging.info(f"Extracted text from child divs: {date_lines}")
 
     return {
         'lines': date_lines
     }
-
 
 @app.route('/')
 def index():
